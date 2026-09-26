@@ -1,0 +1,31 @@
+{
+  "league": "cfb",
+  "adapters": {
+    "espn": {
+      "error": "HTTP Error 403: Forbidden"
+    },
+    "odds_api": {
+      "games": 0,
+      "new_lines": 0,
+      "new_splits": 0,
+      "errors": [
+        "ODDS_API_KEY not set; odds_api skipped"
+      ]
+    },
+    "overrides": {
+      "games": 0,
+      "new_lines": 0,
+      "new_splits": 0,
+      "errors": [
+        "unresolved game ref for lines: Ole Miss @ Florida 2026-09-26",
+        "unresolved game ref for lines: Iowa @ Michigan 2026-09-26",
+        "unresolved game ref for splits: Ole Miss @ Florida 2026-09-26",
+        "unresolved game ref for splits: Purdue @ Notre Dame 2026-09-26",
+        "unresolved game ref for splits: Oklahoma @ Georgia 2026-09-26",
+        "unresolved game ref for notes: Ole Miss @ Florida 2026-09-26"
+      ]
+    }
+  },
+  "exported_games": 0,
+  "date_arg": "20260925-20261002"
+}

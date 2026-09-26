@@ -1,0 +1,24 @@
+{
+  "league": "nfl",
+  "adapters": {
+    "espn": {
+      "error": "HTTP Error 403: Forbidden"
+    },
+    "odds_api": {
+      "games": 0,
+      "new_lines": 0,
+      "new_splits": 0,
+      "errors": [
+        "ODDS_API_KEY not set; odds_api skipped"
+      ]
+    },
+    "overrides": {
+      "games": 0,
+      "new_lines": 0,
+      "new_splits": 0,
+      "errors": []
+    }
+  },
+  "exported_games": 0,
+  "date_arg": "20260925-20261002"
+}
