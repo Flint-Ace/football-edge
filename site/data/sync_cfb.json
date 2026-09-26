@@ -2,7 +2,7 @@
   "league": "cfb",
   "adapters": {
     "espn": {
-      "error": "HTTP Error 403: Forbidden"
+      "error": "site.api.espn.com: HTTP Error 403: Forbidden; site.web.api.espn.com: HTTP Error 400: Bad Request; cdn.espn.com: Expecting value: line 1 column 1 (char 0)"
     },
     "odds_api": {
       "games": 0,
