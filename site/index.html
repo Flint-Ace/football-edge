@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Football Edge</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eeeadf;--card:#e5dfcd;--ink:#1b2320;--soft:#5b6152;--line:#cdc4ab;--good:#1f6f6b;--goodbg:#d9e8e4;--bad:#a8432b;--badbg:#f0dcd3;--warn:#a8752a;--warnbg:#efe3c9;--r:3px;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root{--bg:#13171a;--card:#1b201d;--ink:#e8e3d3;--soft:#9ba18e;--line:#343a31;--good:#55b8b0;--goodbg:#1b2d2b;--bad:#dd8064;--badbg:#30221d;--warn:#e0ab52;--warnbg:#2f2a1c}}
+html,body{height:100%}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:13px;line-height:1.5}
+.wrap{max-width:900px;margin:0 auto;padding:18px 14px 70px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:6px}
+h1{font-family:'Fraunces',Georgia,serif;font-weight:700;font-size:26px;margin:0;line-height:1}
+.kicker{font-size:10.5px;color:var(--soft);margin:0 0 4px}
+.div-toggle{display:flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.div-toggle button{border:0;border-radius:0;padding:6px 12px;background:transparent;color:var(--ink);font-weight:500}
+.div-toggle button.on{background:var(--ink);color:var(--bg)}
+nav{display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:8px 0 14px;padding-bottom:6px}
+nav button{white-space:nowrap;border:1px solid transparent;background:transparent;color:var(--soft);padding:6px 10px;font-weight:500;border-radius:var(--r)}
+nav button.on{color:var(--ink);border-color:var(--line);background:var(--card)}
+h2{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+h3{font-size:12px;font-weight:600;margin:14px 0 6px;color:var(--soft)}
+button{font-family:inherit;font-size:12.5px;font-weight:600;padding:8px 13px;border-radius:var(--r);border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer}
+button.ghost{background:transparent;color:var(--ink);border-color:var(--line);font-weight:500}
+input,select,textarea{width:100%;font-family:inherit;font-size:13px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:7px 9px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media (max-width:480px){.g4{grid-template-columns:1fr 1fr}}
+.card{border-top:1px solid var(--line);padding:12px 0}
+.title{font-family:'Fraunces',Georgia,serif;font-size:16px;font-weight:600;cursor:pointer}
+.meta{font-size:11px;color:var(--soft)}
+.row{display:flex;flex-wrap:wrap;gap:6px 14px;margin:4px 0;align-items:center}
+.kv{font-size:12px}
+.tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:2px;margin:2px 4px 2px 0;background:var(--line)}
+.tag.good{background:var(--goodbg);color:var(--good)}.tag.bad{background:var(--badbg);color:var(--bad)}.tag.warn{background:var(--warnbg);color:var(--warn)}
+.mdi{font-family:'Fraunces',Georgia,serif;font-size:24px;font-weight:700;line-height:1}
+.pill{display:inline-block;padding:1px 6px;border-radius:2px;font-size:10px;font-weight:600}
+.pill.n{background:var(--line)}.pill.w{background:var(--warnbg);color:var(--warn)}.pill.i{background:var(--goodbg);color:var(--good)}.pill.m{background:var(--badbg);color:var(--bad)}.pill.x{background:var(--bad);color:#fff}
+table{width:100%;border-collapse:collapse;font-size:11.5px}th,td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line);vertical-align:top}th{font-weight:600;color:var(--soft);font-size:10.5px}
+.tbl{overflow-x:auto}.empty{color:var(--soft);font-size:12.5px;padding:14px 0;text-align:center;border:1px dashed var(--line);border-radius:var(--r)}
+.note{font-size:11px;color:var(--soft);line-height:1.55}
+details{border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin:8px 0;background:var(--card)}summary{cursor:pointer;font-weight:600;font-size:12.5px}
+pre{white-space:pre-wrap;font-size:11px;background:var(--card);border:1px solid var(--line);padding:8px;border-radius:var(--r);word-break:break-all}
+.score{font-family:'Fraunces',Georgia,serif;font-size:18px;font-weight:700}
+.live{color:var(--bad)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><p class="kicker">market intelligence and research</p><h1>Football Edge</h1></div>
+  <div class="div-toggle"><button id="div-cfb" class="on">CFB</button><button id="div-nfl">NFL</button></div>
+</header>
+<div class="meta" id="sync"></div>
+<nav id="nav"></nav>
+<div id="view"></div>
+<div class="note" style="margin-top:26px;border-top:1px solid var(--line);padding-top:10px">
+This page reads only the exported canonical database. Every line and split is a timestamped observation written by a provider adapter (origin auto) or an admin override file (origin override). Nothing is overwritten. MDI measures how unusual the relationship between public action and pricing is; it is not a win probability.
+</div>
+</div>
+<script>
+(function(){
+'use strict';
+var DIV='cfb', TAB='board', DATA=null, selected=null, weekFilter='';
+var TABS=[['board','The Board'],['radar','Edge Radar'],['pulse','Market Pulse'],['public','Public Money'],['linelab','Line Lab'],['game','Game Lab'],['research','Research Lab'],['admin','Admin Override']];
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function fmtML(m){return m==null?'UNKNOWN':(m>0?'+'+m:String(m))}
+function fmtSp(s){return s==null?'UNKNOWN':(s>0?'+'+s:String(s))}
+function fmtPct(p){return p==null?'UNKNOWN':Math.round(p)+'%'}
+function fmtTs(ts){if(!ts)return '';var d=new Date(ts);return isNaN(d)?ts:d.toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}
+function implied(ml){return ml==null?null:(ml>0?100/(ml+100):(-ml)/((-ml)+100))}
+function noVig(a,h){var pa=implied(a),ph=implied(h);return (pa==null||ph==null)?null:{away:pa/(pa+ph),home:ph/(pa+ph)}}
+function wilson(w,n){if(!n)return null;var z=1.96,p=w/n,d=1+z*z/n,c=p+z*z/(2*n),s=z*Math.sqrt(p*(1-p)/n+z*z/(4*n*n));return [(c-s)/d,(c+s)/d]}
+function keyCross(a,b){if(a==null||b==null)return [];var lo=Math.min(Math.abs(a),Math.abs(b)),hi=Math.max(Math.abs(a),Math.abs(b));var o=[];[3,7,10,14].forEach(function(k){if(lo<k&&hi>k)o.push(k);else if((Math.abs(a)===k||Math.abs(b)===k)&&lo!==hi)o.push(k)});return o}
+function extremity(t){if(t==null)return 'UNKNOWN';var m=Math.max(t,100-t);return m<60?'NORMAL':m<70?'PUBLIC LEAN':m<80?'HEAVY PUBLIC':m<90?'EXTREME PUBLIC':'MASSIVE PUBLIC'}
+function hoursAgo(ts){return (Date.now()-new Date(ts).getTime())/36e5}
+function label(g){return (g.away.rank?'#'+g.away.rank+' ':'')+g.away.name+' @ '+(g.home.rank?'#'+g.home.rank+' ':'')+g.home.name}
+function bookKey(o){return o.provider+' / '+o.book}
+
+/* ---------- analysis on canonical data ---------- */
+function linesByBook(g){var m={};(g.lines||[]).forEach(function(o){(m[bookKey(o)]=m[bookKey(o)]||[]).push(o)});Object.keys(m).forEach(function(k){m[k].sort(function(a,b){return a.ts.localeCompare(b.ts)})});return m}
+function splitsByBook(g){var m={};(g.splits||[]).forEach(function(o){(m[bookKey(o)]=m[bookKey(o)]||[]).push(o)});Object.keys(m).forEach(function(k){m[k].sort(function(a,b){return a.ts.localeCompare(b.ts)})});return m}
+function openCurClose(list){var open=list.filter(function(o){return o.is_open})[0]||list[0];var close=list.filter(function(o){return o.is_close})[0]||null;var cur=list.filter(function(o){return !o.is_open}).slice(-1)[0]||list[list.length-1];return {open:open,cur:close||cur,close:close,latest:cur}}
+function referenceBook(LB){var best=null;Object.keys(LB).forEach(function(k){if(!best||LB[k].length>LB[best].length)best=k});return best}
+function analyze(g){
+  var LB=linesByBook(g),SB=splitsByBook(g),ref=referenceBook(LB);
+  var A={books:Object.keys(LB).length,splitBooks:Object.keys(SB).length,flags:[],maxTix:null,maxTixWhere:null,div:null,divWhere:null,rlm:[],withPub:[],resist:[],keys:[],crossBook:null,perBook:{},fresh:null,hasHandle:false,hasOpen:false,hasML:false,ref:ref};
+  var curSpreads=[];
+  Object.keys(LB).forEach(function(k){var occ=openCurClose(LB[k]);A.perBook[k]=occ;if(occ.open&&occ.open.is_open)A.hasOpen=true;if(occ.cur.ml_away!=null&&occ.cur.ml_home!=null)A.hasML=true;if(occ.cur.spread_home!=null)curSpreads.push(occ.cur.spread_home);var fh=hoursAgo(occ.latest.last_seen||occ.latest.ts);if(A.fresh==null||fh<A.fresh)A.fresh=fh;
+    if(occ.open&&occ.open!==occ.cur){var kc=keyCross(occ.open.spread_home,occ.cur.spread_home);if(kc.length)A.keys.push({book:k,keys:kc,from:occ.open.spread_home,to:occ.cur.spread_home})}});
+  if(curSpreads.length>1)A.crossBook=Math.max.apply(null,curSpreads)-Math.min.apply(null,curSpreads);
+  Object.keys(SB).forEach(function(k){var s=SB[k].slice(-1)[0];if(s.spread_hdl_away!=null||s.ml_hdl_away!=null)A.hasHandle=true;
+    var lk=LB[k]?k:ref;var occ=lk?A.perBook[lk]:null;var lbl=lk?(lk===k?'':' (movement measured at '+lk+')'):'';
+    function side(v){return v==null?null:(v>=50?'away':'home')}function share(v,sd){return sd==='away'?v:100-v}
+    var ps=side(s.spread_tix_away);if(ps){var t=share(s.spread_tix_away,ps);if(A.maxTix==null||t>A.maxTix){A.maxTix=t;A.maxTixWhere='spread @ '+k}
+      if(s.spread_hdl_away!=null){var d=share(s.spread_hdl_away,ps)-t;if(A.div==null||Math.abs(d)>Math.abs(A.div)){A.div=d;A.divWhere='spread @ '+k}}
+      if(occ&&occ.open&&occ.open!==occ.cur&&occ.open.spread_home!=null&&occ.cur.spread_home!=null){var mv=occ.cur.spread_home-occ.open.spread_home;var forPub=ps==='home'?mv:-mv; /* positive = public side got cheaper */
+        if(t>=65&&forPub>=0.5)A.rlm.push({where:k+lbl,market:'spread',pub:ps,tix:t,mag:forPub,from:occ.open.spread_home,to:occ.cur.spread_home});
+        if(t>=60&&forPub<=-0.5)A.withPub.push({where:k+lbl,market:'spread',tix:t,mag:-forPub});
+        if(t>=80&&Math.abs(forPub)<0.5)A.resist.push({where:k+lbl,market:'spread',tix:t})}}
+    var pm=side(s.ml_tix_away);if(pm){var t2=share(s.ml_tix_away,pm);if(A.maxTix==null||t2>A.maxTix){A.maxTix=t2;A.maxTixWhere='ML @ '+k}
+      if(s.ml_hdl_away!=null){var d2=share(s.ml_hdl_away,pm)-t2;if(A.div==null||Math.abs(d2)>Math.abs(A.div)){A.div=d2;A.divWhere='ML @ '+k}}
+      if(occ&&occ.open&&occ.open!==occ.cur){var a=pm==='away'?occ.open.ml_away:occ.open.ml_home,b=pm==='away'?occ.cur.ml_away:occ.cur.ml_home;if(a!=null&&b!=null){var dm=(implied(b)-implied(a))*100; /* negative = cheaper for public */
+        if(t2>=65&&dm<=-1.5)A.rlm.push({where:k+lbl,market:'ML',pub:pm,tix:t2,mag:-dm,from:a,to:b});if(t2>=60&&dm>=1.5)A.withPub.push({where:k+lbl,market:'ML',tix:t2,mag:dm});if(t2>=80&&Math.abs(dm)<1.5)A.resist.push({where:k+lbl,market:'ML',tix:t2})}}}
+    if(s.over_tix!=null){var to=Math.max(s.over_tix,100-s.over_tix);if(A.maxTix==null||to>A.maxTix){A.maxTix=to;A.maxTixWhere='total @ '+k}if(s.over_hdl!=null){var d3=(s.over_tix>=50?s.over_hdl:100-s.over_hdl)-to;if(A.div==null||Math.abs(d3)>Math.abs(A.div)){A.div=d3;A.divWhere='total @ '+k}}}});
+  var c={};var m=A.maxTix;c.publicExtremity=m==null?0:m<60?0:m<70?8:m<80?15:m<90?22:30;
+  var rm=A.rlm.length?Math.max.apply(null,A.rlm.map(function(r){return r.market==='spread'?r.mag:r.mag/2})):0;c.reverseLineMovement=!A.rlm.length?0:rm>=1.5?25:rm>=1?18:12;
+  var dv=A.div==null?0:Math.abs(A.div);c.ticketHandleDivergence=dv>=35?20:dv>=25?15:dv>=15?10:0;c.priceResistance=A.resist.length?15:0;
+  c.crossBookConfirmation=(A.rlm.length>=2&&new Set(A.rlm.map(function(r){return r.where})).size>=2)?10:0;c.crossBookDisagreement=(A.crossBook!=null&&A.crossBook>=1)?-5:0;
+  var news=0;(g.lines||[]).forEach(function(o){if(/explains/i.test(o.note||''))news=15});c.newsExplanation=-news;
+  var dq=0;if(A.books===0)dq-=15;else if(A.books===1)dq-=8;if(!A.hasHandle)dq-=5;if(A.fresh!=null&&A.fresh>24)dq-=7;if(!A.hasOpen)dq-=3;if(A.splitBooks===0)dq-=5;c.dataQualityPenalty=dq;
+  var mdi=0;Object.keys(c).forEach(function(k){mdi+=c[k]});A.mdi=Math.max(0,Math.min(100,Math.round(mdi)));A.parts=c;A.level=A.mdi<30?'NORMAL':A.mdi<50?'WATCH':A.mdi<70?'SIGNIFICANT DISAGREEMENT':A.mdi<85?'MAJOR ANOMALY':'EXTREME ANOMALY';
+  var q=0;q+=A.books>=2?30:A.books===1?15:0;q+=A.fresh==null?0:A.fresh<3?25:A.fresh<12?18:A.fresh<36?10:3;q+=A.maxTix!=null?15:0;q+=A.hasHandle?15:0;q+=A.hasOpen?10:0;q+=A.hasML?5:0;A.dq=q;
+  if(m!=null&&m>=75)A.flags.push('A: '+Math.round(m)+'% tickets ('+A.maxTixWhere+')');if(A.div!=null&&Math.abs(A.div)>=15)A.flags.push('B: ticket/handle gap '+(A.div>0?'+':'')+Math.round(A.div)+' ('+A.divWhere+')');
+  A.rlm.forEach(function(r){A.flags.push('C: reverse line movement '+r.market+' @ '+r.where+' ('+Math.round(r.tix)+'% on '+r.pub+', '+(r.market==='spread'?fmtSp(r.from)+' to '+fmtSp(r.to):fmtML(r.from)+' to '+fmtML(r.to))+')')});
+  A.withPub.forEach(function(r){A.flags.push('D: moved with public '+r.market+' @ '+r.where)});A.resist.forEach(function(r){A.flags.push('E: price resistance '+r.market+' @ '+r.where+' ('+Math.round(r.tix)+'% tickets, no material move)')});
+  if(g.away.rank&&(!g.home.rank||g.away.rank<g.home.rank)&&m!=null&&m>=75&&/away|spread|ML/.test(A.maxTixWhere||'')){var pubAway=Object.keys(SB).some(function(k){var s=SB[k].slice(-1)[0];return (s.spread_tix_away!=null&&s.spread_tix_away>=50)||(s.ml_tix_away!=null&&s.ml_tix_away>=50)});if(pubAway)A.flags.push('F: ranked road team with 75%+ public action')}
+  if(A.crossBook!=null&&A.crossBook>=1)A.flags.push('G: cross-book spread disagreement of '+A.crossBook);A.keys.forEach(function(k){A.flags.push('Key number crossed '+k.keys.join(', ')+' @ '+k.book+' ('+fmtSp(k.from)+' to '+fmtSp(k.to)+')')});
+  var fp=[];if(m!=null)fp.push('PUB'+(m<60?'<60':m<70?'60':m<80?'70':m<90?'80':'90'));if(A.rlm.length)fp.push('RLM');if(A.resist.length)fp.push('RES');if(dv>=15)fp.push('DIV'+(A.div>0?'+':'-'));if(A.withPub.length)fp.push('WITHPUB');
+  var rb=ref?A.perBook[ref].cur:null;if(rb&&rb.spread_home!=null)fp.push(rb.spread_home<0?'HOMEFAV':'AWAYFAV');if(g.away.rank&&g.home.rank)fp.push('RvR');else if(g.away.rank)fp.push('RANKED-ROAD');else if(g.home.rank)fp.push('RANKED-HOME');if(A.keys.length)fp.push('KEY');A.fingerprint=fp;
+  A.marketProb=(rb&&rb.ml_away!=null&&rb.ml_home!=null)?noVig(rb.ml_away,rb.ml_home):null;
+  return A}
+function whatChanged(g){var out=[];var LB=linesByBook(g);Object.keys(LB).forEach(function(k){var L=LB[k].filter(function(o){return !o.is_open});if(L.length<2)return;var p=L[L.length-2],c=L[L.length-1],ch=[];function d(l,a,b,f){if(a!==b&&(a!=null||b!=null))ch.push(l+': '+f(a)+' to '+f(b))}
+  d('Spread (home)',p.spread_home,c.spread_home,fmtSp);d('ML away',p.ml_away,c.ml_away,fmtML);d('ML home',p.ml_home,c.ml_home,fmtML);d('Total',p.total,c.total,function(x){return x==null?'UNKNOWN':x});if(ch.length)out.push({book:k,from:p.ts,to:c.ts,changes:ch,news:c.note||'None identified'})});
+  var SB=splitsByBook(g);Object.keys(SB).forEach(function(k){var L=SB[k];if(L.length<2)return;var p=L[L.length-2],c=L[L.length-1],ch=[];function d(l,a,b){if(a!==b&&(a!=null||b!=null))ch.push(l+': '+fmtPct(a)+' to '+fmtPct(b))}d('Spread tix away',p.spread_tix_away,c.spread_tix_away);d('Spread handle away',p.spread_hdl_away,c.spread_hdl_away);d('ML tix away',p.ml_tix_away,c.ml_tix_away);d('ML handle away',p.ml_hdl_away,c.ml_hdl_away);if(ch.length)out.push({book:k,from:p.ts,to:c.ts,changes:ch,news:''})});return out}
+
+/* ---------- rendering ---------- */
+function games(){var gs=(DATA&&DATA.games)||[];if(weekFilter)gs=gs.filter(function(g){return String(g.week)===weekFilter});return gs.slice().sort(function(a,b){return a.kickoff_utc.localeCompare(b.kickoff_utc)})}
+function weeks(){var w={};((DATA&&DATA.games)||[]).forEach(function(g){if(g.week!=null)w[g.week]=1});return Object.keys(w).sort(function(a,b){return a-b})}
+function pill(A){var c=A.mdi<30?'n':A.mdi<50?'w':A.mdi<70?'i':A.mdi<85?'m':'x';return '<span class="pill '+c+'">'+A.level+'</span>'}
+function card(g,A){var ref=A.ref?A.perBook[A.ref].cur:null;var h='<div class="card"><div class="title" data-open="'+g.id+'">'+esc(label(g))+'</div><div class="meta">Week '+esc(g.week)+' · '+fmtTs(g.kickoff_utc)+(g.neutral?' · neutral':'')+(g.venue?' · '+esc(g.venue):'')+'</div>';
+  if(g.status!=='scheduled')h+='<div class="score'+(g.status==='in_progress'?' live':'')+'">'+esc(g.away.abbrev||g.away.name)+' '+g.score_away+' '+esc(g.home.abbrev||g.home.name)+' '+g.score_home+' <span class="meta">'+(g.status==='final'?'final':'Q'+g.period+' '+esc(g.clock))+'</span></div>';
+  if(ref)h+='<div class="row"><span class="kv">'+esc(A.ref)+' '+fmtTs(ref.ts)+(ref.is_close?' (close)':'')+': home '+fmtSp(ref.spread_home)+' · ML '+fmtML(ref.ml_away)+' / '+fmtML(ref.ml_home)+' · total '+(ref.total==null?'UNKNOWN':ref.total)+'</span></div>';else h+='<div class="meta">No lines yet.</div>';
+  var SB=splitsByBook(g);Object.keys(SB).forEach(function(k){var s=SB[k].slice(-1)[0];h+='<div class="row"><span class="kv">'+esc(k)+' '+fmtTs(s.ts)+': spread tix/hdl (away) '+fmtPct(s.spread_tix_away)+' / '+fmtPct(s.spread_hdl_away)+' · ML '+fmtPct(s.ml_tix_away)+' / '+fmtPct(s.ml_hdl_away)+' · over '+fmtPct(s.over_tix)+' / '+fmtPct(s.over_hdl)+'</span></div>'});
+  h+='<div class="row"><span class="mdi">'+A.mdi+'</span><span class="meta">MDI</span>'+pill(A)+'<span class="meta">DQ '+A.dq+'</span><span class="meta">'+extremity(A.maxTix)+'</span></div>';
+  if(A.flags.length)h+='<div>'+A.flags.map(function(f){return '<span class="tag '+(f[0]==='C'?'good':f[0]==='E'?'warn':'')+'">'+esc(f)+'</span>'}).join('')+'</div>';
+  h+='<div class="meta">'+A.fingerprint.join(' | ')+'</div></div>';return h}
+function bind(){document.querySelectorAll('[data-open]').forEach(function(el){el.onclick=function(){selected=el.getAttribute('data-open');TAB='game';render()}});var wf=$('week-filter');if(wf)wf.onchange=function(){weekFilter=wf.value;render()};var sg=$('sel-game');if(sg)sg.onchange=function(){selected=sg.value;render()}}
+function weekSel(){return '<div style="max-width:200px;margin:6px 0"><select id="week-filter"><option value="">All weeks</option>'+weeks().map(function(w){return '<option value="'+w+'"'+(weekFilter===w?' selected':'')+'>Week '+w+'</option>'}).join('')+'</select></div>'}
+function render(){$('nav').innerHTML=TABS.map(function(t){return '<button data-tab="'+t[0]+'" class="'+(TAB===t[0]?'on':'')+'">'+t[1]+'</button>'}).join('');$('nav').querySelectorAll('button').forEach(function(b){b.onclick=function(){TAB=b.getAttribute('data-tab');render()}});
+  $('div-cfb').className=DIV==='cfb'?'on':'';$('div-nfl').className=DIV==='nfl'?'on':'';
+  if(DATA)$('sync').textContent='Data generated '+fmtTs(DATA.generated_at)+' ('+Math.round(hoursAgo(DATA.generated_at)*60)+' min ago) · '+DATA.games.length+' games in store';
+  var v=$('view');var gs=games();
+  if(!DATA){v.innerHTML='<div class="empty">No data file for '+DIV.toUpperCase()+' yet. Run the sync.</div>';return}
+  if(TAB==='board'){v.innerHTML='<h2>The Board</h2>'+weekSel()+(gs.length?gs.map(function(g){return card(g,analyze(g))}).join(''):'<div class="empty">No games.</div>')}
+  else if(TAB==='radar'){var rows=gs.map(function(g){return {g:g,A:analyze(g)}}).filter(function(x){return x.A.mdi>=30}).sort(function(a,b){return b.A.mdi-a.A.mdi});v.innerHTML='<h2>Edge Radar</h2>'+weekSel()+(rows.length?rows.map(function(x){return card(x.g,x.A)}).join(''):'<div class="empty">Nothing at WATCH or above. That is an acceptable outcome.</div>')}
+  else if(TAB==='pulse'){var h='<h2>Market Pulse</h2>'+weekSel(),any=false;gs.forEach(function(g){var ch=whatChanged(g);if(!ch.length)return;any=true;h+='<div class="card"><div class="title" data-open="'+g.id+'">'+esc(label(g))+'</div>'+ch.map(function(c){return '<div class="meta">'+esc(c.book)+': '+fmtTs(c.from)+' to '+fmtTs(c.to)+'</div><ul style="margin:2px 0 6px 18px;padding:0">'+c.changes.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'+(c.news?'<div class="meta">Note: '+esc(c.news)+'</div>':'')}).join('')+'</div>'});v.innerHTML=any?h:h+'<div class="empty">No book has two observations on the same game yet.</div>'}
+  else if(TAB==='public'){var h2='<h2>Public Money</h2>'+weekSel()+'<div class="tbl"><table><tr><th>Game</th><th>Provider / book</th><th>As of</th><th>Spread tix / hdl (away)</th><th>ML tix / hdl (away)</th><th>Over tix / hdl</th></tr>',any2=false;gs.forEach(function(g){var SB=splitsByBook(g);Object.keys(SB).forEach(function(k){var s=SB[k].slice(-1)[0];any2=true;h2+='<tr><td>'+esc(g.away.name+' @ '+g.home.name)+'</td><td>'+esc(k)+'</td><td>'+fmtTs(s.ts)+'</td><td>'+fmtPct(s.spread_tix_away)+' / '+fmtPct(s.spread_hdl_away)+'</td><td>'+fmtPct(s.ml_tix_away)+' / '+fmtPct(s.ml_hdl_away)+'</td><td>'+fmtPct(s.over_tix)+' / '+fmtPct(s.over_hdl)+'</td></tr>'})});v.innerHTML=h2+'</table></div>'+(any2?'':'<div class="empty">No splits in store. Splits arrive from adapters or override files.</div>')}
+  else if(TAB==='linelab'){var h3='<h2>Line Lab</h2>'+weekSel()+'<div class="tbl"><table><tr><th>Game</th><th>Provider / book</th><th>Open</th><th>Current</th><th>Close</th><th>Move (home)</th><th>Keys</th><th>Obs</th></tr>';gs.forEach(function(g){var LB=linesByBook(g);Object.keys(LB).forEach(function(k){var o=openCurClose(LB[k]);var mv=(o.open.spread_home!=null&&o.cur.spread_home!=null)?o.cur.spread_home-o.open.spread_home:null;h3+='<tr><td>'+esc(g.away.name+' @ '+g.home.name)+'</td><td>'+esc(k)+'</td><td>'+fmtSp(o.open.spread_home)+' / '+fmtML(o.open.ml_away)+' '+fmtML(o.open.ml_home)+' / '+(o.open.total==null?'?':o.open.total)+(o.open.is_open?'':' <span class="meta">(earliest)</span>')+'</td><td>'+fmtSp(o.latest.spread_home)+' / '+fmtML(o.latest.ml_away)+' '+fmtML(o.latest.ml_home)+' / '+(o.latest.total==null?'?':o.latest.total)+'</td><td>'+(o.close?fmtSp(o.close.spread_home)+' / '+fmtML(o.close.ml_away)+' '+fmtML(o.close.ml_home):'not yet')+'</td><td>'+(mv==null?'UNKNOWN':(mv>0?'+':'')+mv)+'</td><td>'+keyCross(o.open.spread_home,o.cur.spread_home).join(', ')+'</td><td>'+LB[k].length+'</td></tr>'})});v.innerHTML=h3+'</table></div>'}
+  else if(TAB==='game')v.innerHTML=viewGame(gs);
+  else if(TAB==='research')v.innerHTML=viewResearch();
+  else if(TAB==='admin')v.innerHTML=viewAdmin(gs);
+  bind()}
+function viewGame(gs){if(!gs.length)return '<h2>Game Lab</h2><div class="empty">No games.</div>';var all=(DATA.games||[]);var g=all.filter(function(x){return x.id===selected})[0]||gs[0];selected=g.id;var A=analyze(g);
+  var h='<h2>Game Lab</h2><select id="sel-game">'+gs.map(function(x){return '<option value="'+x.id+'"'+(x.id===g.id?' selected':'')+'>'+esc(label(x))+'</option>'}).join('')+'</select>'+card(g,A);
+  h+='<h3>MDI breakdown</h3><div class="tbl"><table>'+Object.keys(A.parts).map(function(k){return '<tr><td>'+k.replace(/([A-Z])/g,' $1').toLowerCase()+'</td><td>'+(A.parts[k]>0?'+':'')+A.parts[k]+'</td></tr>'}).join('')+'</table></div><div class="note">Data quality '+A.dq+'/100: '+A.books+' line book(s), '+A.splitBooks+' split source(s), freshest '+(A.fresh==null?'none':Math.round(A.fresh)+'h old')+', handle '+(A.hasHandle?'present':'missing')+', opener '+(A.hasOpen?'present':'missing')+'.</div>';
+  if(A.marketProb)h+='<div class="row"><span class="kv">No-vig market probability (home): '+Math.round(A.marketProb.home*1000)/10+'% at '+esc(A.ref)+'</span></div>';
+  var L=(g.lines||[]).slice().sort(function(a,b){return a.ts.localeCompare(b.ts)});h+='<h3>Line timeline ('+L.length+' observations, append only)</h3><div class="tbl"><table><tr><th>Time</th><th>Provider / book</th><th>Spread</th><th>ML</th><th>Total</th><th>Origin</th><th>Note</th></tr>'+L.map(function(o){return '<tr><td>'+fmtTs(o.ts)+(o.is_open?' <span class="tag">open</span>':'')+(o.is_close?' <span class="tag">close</span>':'')+(o.last_seen&&o.last_seen!==o.ts?'<div class="meta">unchanged through '+fmtTs(o.last_seen)+'</div>':'')+'</td><td>'+esc(bookKey(o))+'</td><td>'+fmtSp(o.spread_home)+(o.spread_juice_home!=null?' ('+fmtML(o.spread_juice_home)+'/'+fmtML(o.spread_juice_away)+')':'')+'</td><td>'+fmtML(o.ml_away)+' / '+fmtML(o.ml_home)+'</td><td>'+(o.total==null?'UNKNOWN':o.total)+'</td><td>'+esc(o.origin)+'</td><td class="meta">'+esc(o.note||'')+'</td></tr>'}).join('')+'</table></div>';
+  var S=(g.splits||[]).slice().sort(function(a,b){return a.ts.localeCompare(b.ts)});if(S.length)h+='<h3>Split timeline</h3><div class="tbl"><table><tr><th>Time</th><th>Provider / book</th><th>Spread tix/hdl (away)</th><th>ML tix/hdl (away)</th><th>Over tix/hdl</th><th>Source</th></tr>'+S.map(function(s){return '<tr><td>'+fmtTs(s.ts)+'</td><td>'+esc(bookKey(s))+'</td><td>'+fmtPct(s.spread_tix_away)+' / '+fmtPct(s.spread_hdl_away)+'</td><td>'+fmtPct(s.ml_tix_away)+' / '+fmtPct(s.ml_hdl_away)+'</td><td>'+fmtPct(s.over_tix)+' / '+fmtPct(s.over_hdl)+'</td><td class="meta">'+esc(s.source||'')+'</td></tr>'}).join('')+'</table></div>';
+  var ch=whatChanged(g);if(ch.length)h+='<h3>What changed</h3>'+ch.map(function(c){return '<div class="meta">'+esc(c.book)+', since '+fmtTs(c.from)+'</div><ul style="margin:2px 0 8px 18px;padding:0">'+c.changes.map(function(x){return '<li>'+esc(x)+'</li>'}).join('')+'</ul>'}).join('');
+  var sim=all.filter(function(x){if(x.id===g.id)return false;var B=analyze(x);var core=function(t){return /^PUB|^RLM|^RES|^DIV/.test(t)};var shared=A.fingerprint.filter(function(t){return B.fingerprint.indexOf(t)>=0});return shared.filter(core).length>=2&&shared.length>=3});
+  h+='<h3>Market fingerprint</h3><div class="meta">'+A.fingerprint.join(' | ')+'</div>'+(sim.length?'<div class="note">Similar games in store: '+sim.map(function(x){return esc(label(x))+(x.status==='final'?' (final '+x.score_away+'-'+x.score_home+')':'')}).join('; ')+'</div>':'');
+  var N=g.notes||[];h+='<h3>Investigation log</h3>'+(N.length?N.map(function(n){return '<div class="card" style="padding:6px 0"><div class="meta">'+fmtTs(n.ts)+' · '+esc(n.kind)+'</div><div>'+esc(n.text)+'</div></div>'}).join(''):'<div class="meta">No notes. Add them through an override file.</div>');
+  if(g.status==='final')h+='<h3>Result and closing lines</h3><div class="kv">Final '+esc(g.away.name)+' '+g.score_away+', '+esc(g.home.name)+' '+g.score_home+'</div>'+Object.keys(A.perBook).map(function(k){var c=A.perBook[k].close;if(!c)return '';var ats=c.spread_home==null?'':((g.score_home+c.spread_home)>g.score_away?esc(g.home.name)+' covered':(g.score_home+c.spread_home)<g.score_away?esc(g.away.name)+' covered':'push');var tot=c.total==null?'':((g.score_home+g.score_away)>c.total?'over':(g.score_home+g.score_away)<c.total?'under':'push');return '<div class="meta">'+esc(k)+' close: home '+fmtSp(c.spread_home)+' ('+ats+'), total '+(c.total==null?'UNKNOWN':c.total)+' ('+tot+')</div>'}).join('');
+  return h}
+function viewResearch(){var all=(DATA.games||[]).filter(function(g){return g.status==='final'});var h='<h2>Research Lab</h2><p class="note">Hypothesis under test: when a large share of tickets is on one side, does the other side beat the closing line after vig? Uses closing lines detected by the store (per provider and book), the latest split from each split source, and final scores. One observation per split source per game; sources are never merged. This is a prospective sample that starts near zero. Wilson 95% intervals. Break-even at -110 is 52.4%.</p>';
+  if(!all.length)return h+'<div class="empty">No final games in store yet. Sample is 0. That is the honest answer today.</div>';
+  var ths=[60,65,70,75,80,85,90],mk=[['Spread tickets','spread_tix_away','spread'],['Spread handle','spread_hdl_away','spread'],['ML tickets','ml_tix_away','ml'],['ML handle','ml_hdl_away','ml']];
+  h+='<div class="tbl"><table><tr><th>Market</th><th>Threshold</th><th>n</th><th>Fade W-L-P</th><th>Fade win %</th><th>95% CI</th><th>Fade ROI</th></tr>';
+  mk.forEach(function(m){ths.forEach(function(t){var n=0,w=0,l=0,p=0,u=0;all.forEach(function(g){var A=analyze(g);var ref=A.ref?A.perBook[A.ref]:null;var close=ref?(ref.close||ref.cur):null;if(!close)return;var SB=splitsByBook(g);Object.keys(SB).forEach(function(k){var s=SB[k].slice(-1)[0];var v=s[m[1]];if(v==null)return;var pub=v>=50?'away':'home';var share=v>=50?v:100-v;if(share<t)return;var fade=pub==='away'?'home':'away';var mine=fade==='away'?g.score_away:g.score_home,oth=fade==='away'?g.score_home:g.score_away;
+      if(m[2]==='spread'){if(close.spread_home==null)return;var line=fade==='home'?close.spread_home:-close.spread_home;var mg=mine-oth+line;n++;if(mg===0)p++;else if(mg>0){w++;u+=100/110}else{l++;u-=1}}else{var price=fade==='away'?close.ml_away:close.ml_home;if(price==null)return;n++;if(mine===oth)p++;else if(mine>oth){w++;u+=(price>0?price/100:100/(-price))}else{l++;u-=1}}})});
+    if(!n)return;var ci=wilson(w,w+l);h+='<tr><td>'+m[0]+'</td><td>'+t+'%+</td><td>'+n+'</td><td>'+w+'-'+l+'-'+p+'</td><td>'+((w+l)?Math.round(w/(w+l)*1000)/10+'%':'-')+'</td><td>'+(ci?Math.round(ci[0]*1000)/10+'% to '+Math.round(ci[1]*1000)/10+'%':'-')+'</td><td>'+(u/n*100).toFixed(1)+'%</td></tr>'})});
+  return h+'</table></div><div class="note">Many thresholds are tested at once; a few rows will look good by chance. Nothing here is a strategy until it survives seasons, conferences, outlier removal and vig, out of sample.</div>'}
+function viewAdmin(gs){var h='<h2>Admin Override</h2><p class="note">Manual entry is not the normal path. Use this only for data no adapter can reach (a split from Action Network, VSIN, SBD or your own book\'s app, a correction, an investigation note). It generates an override file in the canonical schema; commit it to overrides/ and the next sync ingests it with origin = override. Nothing is written from this page.</p>';
+  h+='<form id="f-ov"><div><label>Game</label><select name="game">'+gs.map(function(x){return '<option value="'+x.id+'">'+esc(label(x))+'</option>'}).join('')+'</select></div><div class="g4"><div><label>Type</label><select name="type"><option value="split">Split</option><option value="line">Line</option><option value="note">Note</option><option value="result">Result</option></select></div><div><label>Timestamp (local)</label><input name="ts" type="datetime-local"></div><div><label>Provider / source</label><input name="provider" placeholder="action_network"></div><div><label>Book</label><input name="book" placeholder="DraftKings or unspecified"></div></div>'+
+  '<div class="g4"><div><label>Spread tix % away</label><input name="spread_tix_away" type="number"></div><div><label>Spread hdl % away</label><input name="spread_hdl_away" type="number"></div><div><label>ML tix % away</label><input name="ml_tix_away" type="number"></div><div><label>ML hdl % away</label><input name="ml_hdl_away" type="number"></div></div>'+
+  '<div class="g4"><div><label>Spread (home)</label><input name="spread_home" type="number" step="0.5"></div><div><label>ML away</label><input name="ml_away" type="number"></div><div><label>ML home</label><input name="ml_home" type="number"></div><div><label>Total</label><input name="total" type="number" step="0.5"></div></div>'+
+  '<div class="g4"><div><label>Away score</label><input name="away_score" type="number"></div><div><label>Home score</label><input name="home_score" type="number"></div><div><label>Note kind</label><input name="kind" placeholder="Possible explanation"></div><div></div></div><div><label>Text / source / note</label><textarea name="text"></textarea></div><button type="submit">Generate override JSON</button></form><pre id="ov-out">(output appears here)</pre>';
+  setTimeout(function(){var f=$('f-ov');if(!f)return;var tsIn=f.querySelector('[name=ts]');var d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());tsIn.value=d.toISOString().slice(0,16);f.onsubmit=function(e){e.preventDefault();var o={};new FormData(f).forEach(function(v,k){o[k]=v});var ts=new Date(o.ts).toISOString();var doc={league:DIV};function n(v){return v===''?undefined:parseFloat(v)}
+    if(o.type==='split'){doc.splits={};doc.splits[o.game]=[{ts:ts,provider:o.provider||'manual',book:o.book||'unspecified',spread_tix_away:n(o.spread_tix_away),spread_hdl_away:n(o.spread_hdl_away),ml_tix_away:n(o.ml_tix_away),ml_hdl_away:n(o.ml_hdl_away),source:o.text}]}
+    else if(o.type==='line'){doc.lines={};doc.lines[o.game]=[{ts:ts,provider:o.provider||'manual',book:o.book||'unspecified',spread_home:n(o.spread_home),ml_away:n(o.ml_away),ml_home:n(o.ml_home),total:n(o.total),note:o.text}]}
+    else if(o.type==='note'){doc.notes={};doc.notes[o.game]=[{ts:ts,kind:o.kind||'General',text:o.text}]}
+    else{doc.results={};doc.results[o.game]={away_score:n(o.away_score),home_score:n(o.home_score)}}
+    $('ov-out').textContent=JSON.stringify(doc,function(k,v){return v===undefined?undefined:v},2)}},0);return h}
+function load(){DATA=null;render();fetch('data/'+DIV+'.json',{cache:'no-store'}).then(function(r){return r.ok?r.json():null}).then(function(d){DATA=d;render()}).catch(function(){DATA=null;render()})}
+$('div-cfb').onclick=function(){DIV='cfb';TAB='board';weekFilter='';load()};$('div-nfl').onclick=function(){DIV='nfl';TAB='board';weekFilter='';load()};
+load();
+})();
+</script>
+</body>
+</html>
