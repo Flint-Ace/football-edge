@@ -59,11 +59,38 @@ class ESPNAdapter(Adapter):
             u += f"&week={week}"
         return u
 
+    HOSTS = [
+        "https://site.api.espn.com/apis/site/v2/sports/football/{league}/scoreboard",
+        "https://site.web.api.espn.com/apis/site/v2/sports/football/{league}/scoreboard",
+        "https://cdn.espn.com/core/{league}/scoreboard",
+    ]
+
     def fetch(self, league: str, date: str = None, week: int = None, **kw) -> AdapterResult:
-        req = urllib.request.Request(self.url(league, date, week), headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36", "Accept": "application/json,text/plain,*/*", "Accept-Language": "en-US,en;q=0.9", "Referer": "https://www.espn.com/"})
-        with urllib.request.urlopen(req, timeout=30) as r:
-            payload = json.load(r)
-        return self.parse(league, payload)
+        q = "?limit=300" + ("&groups=80" if league == "cfb" else "")
+        if date:
+            q += f"&dates={date}"
+        if week:
+            q += f"&week={week}"
+        headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36",
+                   "Accept": "application/json,text/plain,*/*", "Accept-Language": "en-US,en;q=0.9",
+                   "Referer": "https://www.espn.com/"}
+        errors = []
+        for host in self.HOSTS:
+            u = host.format(league=LEAGUE_PATH[league]) + q
+            if "cdn.espn.com" in host:
+                u += "&xhr=1"
+            try:
+                req = urllib.request.Request(u, headers=headers)
+                with urllib.request.urlopen(req, timeout=30) as r:
+                    payload = json.load(r)
+                if "cdn.espn.com" in host:
+                    payload = payload.get("content", {}).get("sbData", payload)
+                res = self.parse(league, payload)
+                res.errors.append(f"source host: {host.split('/')[2]}")
+                return res
+            except Exception as e:
+                errors.append(f"{host.split('/')[2]}: {e}")
+        raise RuntimeError("; ".join(errors))
 
     def parse(self, league: str, payload, **kw) -> AdapterResult:
         out = AdapterResult()
