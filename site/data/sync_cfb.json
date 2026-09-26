@@ -1,8 +1,13 @@
 {
   "league": "cfb",
   "adapters": {
-    "espn": {
-      "error": "site.api.espn.com: HTTP Error 403: Forbidden; site.web.api.espn.com: HTTP Error 400: Bad Request; cdn.espn.com: Expecting value: line 1 column 1 (char 0)"
+    "cfbd": {
+      "games": 0,
+      "new_lines": 0,
+      "new_splits": 0,
+      "errors": [
+        "CFBD_API_KEY not set; cfbd skipped"
+      ]
     },
     "odds_api": {
       "games": 0,
@@ -10,6 +15,14 @@
       "new_splits": 0,
       "errors": [
         "ODDS_API_KEY not set; odds_api skipped"
+      ]
+    },
+    "splits_none": {
+      "games": 0,
+      "new_lines": 0,
+      "new_splits": 0,
+      "errors": [
+        "splits UNAVAILABLE: no splits provider connected (overrides only)"
       ]
     },
     "overrides": {
@@ -26,6 +39,6 @@
       ]
     }
   },
-  "exported_games": 0,
-  "date_arg": "20260925-20261002"
+  "skipped": [],
+  "exported_games": 0
 }
