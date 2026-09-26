@@ -15,6 +15,7 @@ from dataclasses import asdict
 from typing import Iterable, List, Optional
 
 from .schema import Game, LineObservation, SplitObservation
+from .matching import match_game
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS games (
@@ -30,6 +31,10 @@ CREATE TABLE IF NOT EXISTS split_obs (
 CREATE INDEX IF NOT EXISTS ix_split_game ON split_obs(game_id, provider, book, ts);
 CREATE TABLE IF NOT EXISTS notes (
   rowid INTEGER PRIMARY KEY, game_id TEXT, ts TEXT, kind TEXT, text TEXT, origin TEXT);
+CREATE TABLE IF NOT EXISTS provider_status (
+  provider TEXT, league TEXT, last_attempt TEXT, last_success TEXT, ok INT, error TEXT,
+  games INT, lines INT, splits INT, quota_remaining INT, quota_used INT, extra TEXT,
+  PRIMARY KEY(provider, league));
 CREATE TABLE IF NOT EXISTS sync_log (
   rowid INTEGER PRIMARY KEY, ts TEXT, league TEXT, adapter TEXT, games INT, lines INT, splits INT, errors TEXT);
 """
@@ -50,7 +55,31 @@ class Store:
         self.conn.executescript(SCHEMA)
 
     # ---- games ----
+    RANK = {"scheduled": 0, "in_progress": 1, "final": 2}
+
     def upsert_game(self, g: Game):
+        """Merge, never blindly replace: a later provider with less detail
+        must not erase scores, week, venue or conference from an earlier one,
+        and status never regresses (final stays final)."""
+        old = self.get_game(g.id)
+        if old:
+            new = g.to_dict()
+            for k, v in list(new.items()):
+                if v in (None, "", {}, []) and old.get(k) not in (None, "", {}, []):
+                    new[k] = old[k]
+            for side in ("away", "home"):
+                for k, v in list(new[side].items()):
+                    if v in (None, "", {}) and old[side].get(k) not in (None, "", {}):
+                        new[side][k] = old[side][k]
+                new[side]["external_ids"] = {**old[side].get("external_ids", {}), **(g.to_dict()[side].get("external_ids") or {})}
+            new["external_ids"] = {**old.get("external_ids", {}), **(g.external_ids or {})}
+            if self.RANK.get(new["status"], 0) < self.RANK.get(old.get("status"), 0):
+                new["status"] = old["status"]
+                if old.get("score_away") is not None:
+                    new["score_away"], new["score_home"], new["final_ts"] = old["score_away"], old["score_home"], old.get("final_ts")
+            self.conn.execute("UPDATE games SET league=?,season=?,week=?,kickoff_utc=?,status=?,json=?,updated_at=? WHERE id=?",
+                              (new["league"], new["season"], new["week"], new["kickoff_utc"], new["status"], json.dumps(new), new["updated_at"], g.id))
+            return
         self.conn.execute(
             "INSERT INTO games(id,league,season,week,kickoff_utc,status,json,updated_at) VALUES(?,?,?,?,?,?,?,?) "
             "ON CONFLICT(id) DO UPDATE SET league=excluded.league, season=excluded.season, week=excluded.week, "
@@ -71,6 +100,10 @@ class Store:
         """Accept a canonical id or 'Away @ Home YYYY-MM-DD'."""
         if self.get_game(ref):
             return ref
+        if ref.startswith("MATCH|"):
+            _, kick, away, home = ref.split("|", 3)
+            g = match_game(self.games(league), kick, away, home)
+            return g["id"] if g else None
         if "@" in ref:
             teams, _, date = ref.rpartition(" ")
             away, _, home = teams.partition("@")
@@ -150,6 +183,37 @@ class Store:
 
     def books_for(self, gid: str):
         return self.conn.execute("SELECT DISTINCT provider, book FROM line_obs WHERE game_id=?", (gid,)).fetchall()
+
+    def set_status(self, provider, league, ts, ok, error="", games=0, lines=0, splits=0,
+                   quota_remaining=None, quota_used=None, extra=None):
+        prev = self.conn.execute("SELECT last_success, quota_remaining, quota_used FROM provider_status WHERE provider=? AND league=?",
+                                 (provider, league)).fetchone()
+        last_success = ts if ok else (prev[0] if prev else None)
+        if quota_remaining is None and prev:
+            quota_remaining, quota_used = prev[1], prev[2]
+        self.conn.execute(
+            "INSERT OR REPLACE INTO provider_status(provider,league,last_attempt,last_success,ok,error,games,lines,splits,quota_remaining,quota_used,extra) "
+            "VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",
+            (provider, league, ts, last_success, int(ok), error, games, lines, splits, quota_remaining, quota_used, json.dumps(extra or {})))
+
+    def status(self, league):
+        cols = ["provider", "league", "last_attempt", "last_success", "ok", "error", "games", "lines", "splits", "quota_remaining", "quota_used", "extra"]
+        out = []
+        for r in self.conn.execute("SELECT * FROM provider_status WHERE league=? ORDER BY provider", (league,)):
+            d = dict(zip(cols, r)); d["ok"] = bool(d["ok"]); d["extra"] = json.loads(d["extra"] or "{}"); out.append(d)
+        return out
+
+    def quota(self, provider):
+        r = self.conn.execute("SELECT quota_remaining FROM provider_status WHERE provider=? AND quota_remaining IS NOT NULL ORDER BY last_attempt DESC LIMIT 1", (provider,)).fetchone()
+        return r[0] if r else None
+
+    def all_books(self, league):
+        return [r[0] for r in self.conn.execute(
+            "SELECT DISTINCT l.book FROM line_obs l JOIN games g ON g.id=l.game_id WHERE g.league=? AND l.origin='auto'", (league,))]
+
+    def latest_market_ts(self, league):
+        r = self.conn.execute("SELECT MAX(l.last_seen) FROM line_obs l JOIN games g ON g.id=l.game_id WHERE g.league=? AND l.origin='auto'", (league,)).fetchone()
+        return r[0] if r else None
 
     def log(self, ts, league, adapter, games, lines, splits, errors):
         self.conn.execute("INSERT INTO sync_log(ts,league,adapter,games,lines,splits,errors) VALUES(?,?,?,?,?,?,?)",

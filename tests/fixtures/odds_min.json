@@ -1,0 +1,12 @@
+{"odds":[
+ {"id":"abc","sport_key":"americanfootball_ncaaf","commence_time":"2026-09-26T19:30:00Z","home_team":"Florida Gators","away_team":"Ole Miss Rebels",
+  "bookmakers":[
+   {"key":"draftkings","title":"DraftKings","last_update":"2026-09-26T14:00:00Z","markets":[
+     {"key":"h2h","outcomes":[{"name":"Florida Gators","price":-165},{"name":"Ole Miss Rebels","price":140}]},
+     {"key":"spreads","outcomes":[{"name":"Florida Gators","price":-110,"point":-3.5},{"name":"Ole Miss Rebels","price":-110,"point":3.5}]},
+     {"key":"totals","outcomes":[{"name":"Over","price":-110,"point":60.5},{"name":"Under","price":-110,"point":60.5}]}]},
+   {"key":"fanduel","title":"FanDuel","last_update":"2026-09-26T14:05:00Z","markets":[
+     {"key":"spreads","outcomes":[{"name":"Florida Gators","price":-105,"point":-3},{"name":"Ole Miss Rebels","price":-115,"point":3}]},
+     {"key":"totals","outcomes":[{"name":"Over","price":-112,"point":61},{"name":"Under","price":-108,"point":61}]}]}]},
+ {"id":"zzz","commence_time":"2026-09-26T23:00:00Z","home_team":"Nowhere State Nobodies","away_team":"Ghost Tech Phantoms","bookmakers":[{"key":"x","title":"BetX","last_update":"2026-09-26T14:00:00Z","markets":[{"key":"spreads","outcomes":[{"name":"Nowhere State Nobodies","price":-110,"point":-7},{"name":"Ghost Tech Phantoms","price":-110,"point":7}]}]}]}
+],"scores":[]}

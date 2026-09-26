@@ -1,8 +1,19 @@
 name: football-edge-sync
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 5,17 * * *"                        # market sync: The Odds API + CFBD, twice daily (quota-safe on free tiers)
+    - cron: "0 1,3,7,9,11,13,15,19,21,23 * * *"   # data sync: CFBD schedule/scores/lines every 2h
+    - cron: "30 16-23 * * 6"                      # Saturday extra data syncs (kickoff windows, US afternoon/evening)
+    - cron: "30 0-6 * * 0"                        # Saturday night into Sunday UTC
   workflow_dispatch:
+    inputs:
+      odds:
+        description: "Also pull The Odds API this run (costs credits)"
+        type: boolean
+        default: true
+concurrency:
+  group: football-edge-sync
+  cancel-in-progress: false
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -13,16 +24,26 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Decide mode
+        id: mode
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            if [ "${{ github.event.inputs.odds }}" = "true" ]; then echo "flag=" >> $GITHUB_OUTPUT; else echo "flag=--no-odds" >> $GITHUB_OUTPUT; fi
+          elif [ "${{ github.event.schedule }}" = "0 5,17 * * *" ]; then echo "flag=" >> $GITHUB_OUTPUT
+          else echo "flag=--no-odds" >> $GITHUB_OUTPUT; fi
       - name: Sync CFB and NFL
         env:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+          ODDS_RESERVE: "25"
         run: |
-          python -m football_edge.sync --league cfb --export
-          python -m football_edge.sync --league nfl --export
+          python -m football_edge.sync --league cfb --export ${{ steps.mode.outputs.flag }}
+          python -m football_edge.sync --league nfl --export ${{ steps.mode.outputs.flag }}
       - name: Commit history
         run: |
           git config user.name "football-edge-bot"
           git config user.email "bot@users.noreply.github.com"
           git add football_edge.sqlite site/data
           git commit -m "sync $(date -u +%Y-%m-%dT%H:%MZ)" || echo "no changes"
+          git pull --rebase --autostash || true
           git push

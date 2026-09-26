@@ -1,36 +1,36 @@
 # Football Edge
 
-Provider adapters write into a normalized, append-only store. The UI reads only the exported canonical JSON. Manual entry exists only as Admin Override, through the same schema.
+Market-intelligence research platform for college football (CFB) and NFL, kept as two divisions on one architecture. Provider adapters write into a normalized, append-only store; the UI reads only the exported canonical JSON. No API key ever reaches the browser.
 
-## Layout
-- football_edge/schema.py      canonical models (Game, Team, LineObservation, SplitObservation)
-- football_edge/adapters/      one file per provider; adapters only translate payloads
-    espn.py       schedule, scores, status, rankings, records, weather, DraftKings lines with ESPN's reported opener (no key)
-    odds_api.py   multi-book prices from The Odds API (ODDS_API_KEY)
-    overrides.py  Admin Override files in overrides/*.json
-- football_edge/store.py       SQLite; observations never updated or deleted; identical re-reads bump last_seen only
-- football_edge/ingest.py      adapters -> store; closing-line detection; results
-- football_edge/export.py      store -> site/data/{league}.json
-- football_edge/sync.py        CLI
-- site/index.html              UI (reads site/data only)
-- .github/workflows/sync.yml   cron every 30 minutes, commits the sqlite file and exports
+## Layers
+- CFB game/data layer: CollegeFootballData (`football_edge/adapters/cfbd.py`). Every FBS game for the season: kickoff, venue, conference, status, scores, plus the lines CFBD republishes with reported openers. Needs `CFBD_API_KEY`.
+- Market/odds layer, both divisions: The Odds API (`adapters/odds_api.py`). Every pregame spread, moneyline and total from every US book on the key. For NFL it is also, for now, the schedule and scores layer. Needs `ODDS_API_KEY`. Quota headers are stored; the sync skips this adapter when remaining credits fall under `ODDS_RESERVE` (default 25).
+- Betting splits: `adapters/splits.py` defines the provider interface. No provider is connected; `NullSplitsProvider` reports UNAVAILABLE and nothing is estimated. Plug Sportradar or another source in by subclassing `SplitsProvider` and adding it to `REGISTRY` and `DEFAULT` in `sync.py`.
+- Admin Override: `adapters/overrides.py` reads `overrides/*.json`. The only manual path. Same schema, origin = override.
+- NFL data adapter: not yet written. `sync.DEFAULT["nfl"]` is where it plugs in. Until then NFL schedule and scores come from The Odds API.
+- ESPN adapter remains for local use; ESPN blocks GitHub-hosted runners.
 
-## Run
-    python -m football_edge.sync --league cfb --date 20260926 --export
-    python -m football_edge.sync --league nfl --export
-    python tests/test_pipeline.py
+## Store rules
+`store.py`: games are merged (never blindly replaced; status never regresses); line and split observations are appended, never updated or deleted; identical re-reads bump `last_seen` only. `ingest.detect_closes` marks the last pre-kickoff observation per provider+book as the close once a game goes live. `export.py` derives open (reported opener if present, else first stored), current, close, consensus (median across books, a republished book never double-counted), best available price and movement since open, and grades finals ATS and over/under at the consensus close.
 
-Serve site/ with any static host (GitHub Pages works: enable Pages on the repo, folder /site).
+## Secrets (repository Settings, Secrets and variables, Actions)
+- `ODDS_API_KEY` from the-odds-api.com
+- `CFBD_API_KEY` from collegefootballdata.com
+Never commit a key. The workflow reads them as environment variables only.
 
-## Phase map
-1 schedule, scores, odds: espn adapter (done). Multi-book: odds_api adapter (done, needs key).
-2 line history and closing lines: store + detect_closes (done). History depth is set by the cron cadence.
-3 splits: no free API exists. Overrides today; a scraper adapter for public consensus pages is the next adapter to add, kept separate and labeled by source.
-4 historical import: run espn with --date for past days (ESPN keeps finals and its openers), or add a CSV adapter for a purchased dataset.
-5 to 7: engine, models, injuries and weather build on top of the same store.
+## Cadence (`.github/workflows/sync.yml`)
+- Data sync (CFBD only): every 2 hours, plus every hour on Saturday afternoon and night (US). About 850 CFBD calls a month, under the free tier.
+- Market sync (CFBD + The Odds API): 05:00 and 17:00 UTC daily. About 8 credits per run, roughly 480 a month, under the 500 free credits. Move to a paid Odds API tier to sync markets hourly on game days.
+- Manual: Actions, football-edge-sync, Run workflow (tick "odds" to include The Odds API).
 
-## Rules the code enforces
-- No provider field names reach the UI. The export is the contract.
-- Splits from different books are never merged; each observation carries provider and book.
-- A missing value is null and the UI prints UNKNOWN. Nothing is estimated.
-- Closing line = last non-opener observation at or before kickoff, per provider and book, set once the game goes live.
+## Local
+```
+export CFBD_API_KEY=... ODDS_API_KEY=...
+python -m football_edge.sync --league cfb --export
+python -m football_edge.sync --league nfl --export
+python -m pytest -q tests
+```
+Site: open `site/index.html` over HTTP (GitHub Pages serves the repo root; `/index.html` forwards to `/site/`).
+
+## UI
+Board (command center with filters), Edge Radar, Market Pulse, Public Money, Line Lab, Game Lab (market timeline charts), Paper Book (locked positions, model versions, FE estimates, CLV), Performance Lab, Research Lab, Data Health, Admin Override. Paper Book data lives in the browser's local storage per division; export it from the page.

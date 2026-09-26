@@ -15,6 +15,8 @@ def ingest(store: Store, league: str, adapters: List[Adapter], **fetch_kw) -> di
             res: AdapterResult = ad.fetch(league, **fetch_kw)
         except Exception as e:
             store.log(now, league, ad.name, 0, 0, 0, [f"fetch failed: {e}"])
+            q = getattr(ad, "quota", {}) or {}
+            store.set_status(ad.name, league, now, False, error=str(e), quota_remaining=q.get("remaining"), quota_used=q.get("used"))
             summary["adapters"][ad.name] = {"error": str(e)}
             continue
         n_lines = n_splits = 0
@@ -47,6 +49,14 @@ def ingest(store: Store, league: str, adapters: List[Adapter], **fetch_kw) -> di
             for n in notes:
                 store.add_note(gid, n["ts"], n.get("kind", "General"), n["text"])
         store.log(now, league, ad.name, len(res.games), n_lines, n_splits, res.errors)
+        q = getattr(ad, "quota", {}) or {}
+        skipped = any("not set" in e or "skipped" in e or "UNAVAILABLE" in e for e in res.errors)
+        hard = [e for e in res.errors if e.startswith("cfbd /") or e.startswith("odds_api /")]
+        store.set_status(ad.name, league, now, ok=not skipped and not hard,
+                         error="; ".join(res.errors[:6]) if (skipped or hard) else "",
+                         games=len(res.games), lines=n_lines, splits=n_splits,
+                         quota_remaining=q.get("remaining"), quota_used=q.get("used"),
+                         extra={"errors": res.errors[:40], "unresolved": sum(1 for e in res.errors if e.startswith("unresolved"))})
         summary["adapters"][ad.name] = {"games": len(res.games), "new_lines": n_lines, "new_splits": n_splits, "errors": res.errors}
     detect_closes(store, league)
     store.commit()

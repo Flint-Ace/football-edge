@@ -1,0 +1,8 @@
+{"games":[
+ {"id":401001,"season":2026,"week":4,"seasonType":"regular","startDate":"2026-09-26T19:30:00.000Z","completed":false,"neutralSite":false,"venue":"Ben Hill Griffin Stadium","homeTeam":"Florida","homeConference":"SEC","homePoints":null,"awayTeam":"Ole Miss","awayConference":"SEC","awayPoints":null},
+ {"id":401002,"season":2026,"week":4,"seasonType":"regular","startDate":"2026-09-26T16:00:00.000Z","completed":true,"neutralSite":false,"venue":"Michigan Stadium","homeTeam":"Michigan","homeConference":"Big Ten","homePoints":24,"awayTeam":"Iowa","awayConference":"Big Ten","awayPoints":17}
+],
+"lines":[
+ {"id":401001,"homeTeam":"Florida","awayTeam":"Ole Miss","lines":[{"provider":"DraftKings","spread":-3.5,"spreadOpen":-3,"overUnder":60.5,"overUnderOpen":59.5,"homeMoneyline":-162,"awayMoneyline":136}]},
+ {"id":401002,"homeTeam":"Michigan","awayTeam":"Iowa","lines":[{"provider":"Bovada","spread":-5.5,"spreadOpen":-6,"overUnder":38.5,"overUnderOpen":39}]}
+]}
