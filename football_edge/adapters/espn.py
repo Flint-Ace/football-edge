@@ -60,7 +60,7 @@ class ESPNAdapter(Adapter):
         return u
 
     def fetch(self, league: str, date: str = None, week: int = None, **kw) -> AdapterResult:
-        req = urllib.request.Request(self.url(league, date, week), headers={"User-Agent": "football-edge/0.2"})
+        req = urllib.request.Request(self.url(league, date, week), headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36", "Accept": "application/json,text/plain,*/*", "Accept-Language": "en-US,en;q=0.9", "Referer": "https://www.espn.com/"})
         with urllib.request.urlopen(req, timeout=30) as r:
             payload = json.load(r)
         return self.parse(league, payload)
