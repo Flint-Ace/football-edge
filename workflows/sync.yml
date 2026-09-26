@@ -1,0 +1,28 @@
+name: football-edge-sync
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Sync CFB and NFL
+        env:
+          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
+        run: |
+          python -m football_edge.sync --league cfb --export
+          python -m football_edge.sync --league nfl --export
+      - name: Commit history
+        run: |
+          git config user.name "football-edge-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add football_edge.sqlite site/data
+          git commit -m "sync $(date -u +%Y-%m-%dT%H:%MZ)" || echo "no changes"
+          git push

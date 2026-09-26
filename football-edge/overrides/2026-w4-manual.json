@@ -1,0 +1,41 @@
+{
+  "league": "cfb",
+  "lines": {
+    "Ole Miss @ Florida 2026-09-26": [
+      {"ts": "2026-09-22T16:00:00+00:00", "provider": "action_network_article", "book": "unspecified", "spread_home": -3,
+       "note": "Action Network article: Florida -3, 85 percent of early spread tickets on Ole Miss. Article timestamp not shown; logged as approximate Tuesday."},
+      {"ts": "2026-09-25T16:00:00+00:00", "provider": "si_article", "book": "DraftKings", "spread_home": -3.5, "spread_juice_home": -105,
+       "spread_juice_away": -115, "ml_away": 136, "ml_home": -162, "total": 60.5, "over_juice": -115, "under_juice": -105,
+       "note": "si.com preview citing DraftKings. Article time not shown; logged as approximate Friday."}
+    ],
+    "Iowa @ Michigan 2026-09-26": [
+      {"ts": "2026-09-25T13:54:00+00:00", "provider": "betmgm_blog", "book": "BetMGM", "spread_home": -5.5, "spread_juice_home": -115,
+       "spread_juice_away": -115, "ml_away": 180, "ml_home": -220, "total": 38.5, "over_juice": -110, "under_juice": -108,
+       "note": "sports.betmgm.com public betting page, Sep 25 9:54 AM ET. Ticket widget not readable; splits UNKNOWN."}
+    ]
+  },
+  "splits": {
+    "Ole Miss @ Florida 2026-09-26": [
+      {"ts": "2026-09-21T19:34:00+00:00", "provider": "sportsbettingdime", "book": "unspecified", "ml_tix_away": 39, "ml_hdl_away": 93,
+       "source": "sportsbettingdime.com public betting trends, updated Sep 21 3:34 PM EDT; book not named; ML +140 listed as best line"},
+      {"ts": "2026-09-22T16:00:00+00:00", "provider": "action_network_article", "book": "unspecified", "spread_tix_away": 85,
+       "source": "actionnetwork.com: 85 percent of early spread tickets on Ole Miss. Handle not reported. Timestamp approximate."}
+    ],
+    "Purdue @ Notre Dame 2026-09-26": [
+      {"ts": "2026-09-21T19:34:00+00:00", "provider": "sportsbettingdime", "book": "unspecified", "spread_tix_away": 60, "spread_hdl_away": 60, "ml_tix_away": 2,
+       "source": "sportsbettingdime.com, Sep 21 3:34 PM EDT: Purdue 60 percent of bets and handle at +27.5; Notre Dame 98 percent of ML bets."}
+    ],
+    "Oklahoma @ Georgia 2026-09-26": [
+      {"ts": "2026-09-21T19:34:00+00:00", "provider": "sportsbettingdime", "book": "unspecified", "over_tix": 80, "over_hdl": 83,
+       "source": "sportsbettingdime.com, Sep 21 3:34 PM EDT: Over 43.5 drawing 80 percent of bets and 83 percent of handle."}
+    ]
+  },
+  "notes": {
+    "Ole Miss @ Florida 2026-09-26": [
+      {"ts": "2026-09-26T12:15:00+00:00", "kind": "Actual market price", "text": "DraftKings opener: Florida favored per si.com opening-odds roundup. Exact opening number NOT captured. UNKNOWN. Favorite never flipped."},
+      {"ts": "2026-09-26T12:15:00+00:00", "kind": "Expected public perception", "text": "AP number 4 road team off a national TV win over LSU, Heisman-favorite QB, facing number 21 Florida. Naive expectation: Ole Miss favored. Market has priced Florida as a 3 to 3.5 point favorite throughout."},
+      {"ts": "2026-09-26T12:15:00+00:00", "kind": "Unexplained component", "text": "Sources conflict: Action Network 85 percent of spread tickets on Ole Miss; SBD feed 39 percent of ML tickets but 93 percent of ML handle on Ole Miss. Different markets, different unnamed books. Do not merge. Spread handle UNKNOWN."},
+      {"ts": "2026-09-26T12:15:00+00:00", "kind": "Possible explanation", "text": "Spread moved from Florida -3 (approx Tue) to -3.5 (approx Fri): against 85 percent of spread tickets, across key number 3. Two different sources, not one book's open and current. Possible reverse line movement, not confirmed."}
+    ]
+  }
+}
