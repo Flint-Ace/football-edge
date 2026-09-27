@@ -1,14 +1,6 @@
 {
   "league": "nfl",
   "adapters": {
-    "odds_api": {
-      "games": 0,
-      "new_lines": 0,
-      "new_splits": 0,
-      "errors": [
-        "ODDS_API_KEY not set; odds_api skipped"
-      ]
-    },
     "splits_none": {
       "games": 0,
       "new_lines": 0,
@@ -24,6 +16,8 @@
       "errors": []
     }
   },
-  "skipped": [],
+  "skipped": [
+    "odds_api: skipped by --no-odds"
+  ],
   "exported_games": 0
 }
